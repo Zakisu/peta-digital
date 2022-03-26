@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quick Start - Leaflet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0-beta.0/leaflet.min.css" integrity="sha512-4DBUVB81hf1k3DdMRM7t3yp+X+ePuKMa2qun/Rt/POUEjgfqEhLYnDgPsfqWGWc4mO4x5jjhi5MSPWPH7hU5IQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0-beta.0/leaflet-src.min.js" integrity="sha512-Cgpu61fENYVBxtwpgSzPxKASKnIaLcMWoYtwF6P/KVO9uLre2yDXpAPX+BzhDKIKn5LU+hoJdpE5JlTSPHFMtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div id="map" style="width:100%;height: 60vh"></div>
+            </div>
+        </div>
+        <div class="row">
+            <form>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    var map = L.map('map').setView([-7.771278385982432, 110.37744615503615], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker([-7.771278385982432, 110.37744615503615]).addTo(map)
+        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+        .openPopup();
+
+    var geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            var bbox = e.geocode.bbox;
+            var poly = L.polygon([
+                bbox.getSouthEast(),
+                bbox.getNorthEast(),
+                bbox.getNorthWest(),
+                bbox.getSouthWest()
+            ]).addTo(map);
+            map.fitBounds(poly.getBounds());
+        })
+        .addTo(map);
+
+    //Create GeoJSON layer for user generated data
+    var drawnItems = new L.geoJson();
+    //Add GeoJSON layer to map
+    map.addLayer(drawnItems);
+
+
+    //Leaflet Draw Event
+    map.on('dblclick', function(e) {
+        var marker = L.marker(e.latlng).addTo(map);
+        var markerpopup = L.popup({});
+        //Set popup lat lng where clicked
+        markerpopup.setLatLng(e.latlng);
+        //console.log(e.layer._latlng);
+        //Set popup content
+        markerpopup.setContent("Popup");
+        //Bind marker popup
+        marker.bindPopup(markerpopup);
+        //Add marker to geojson layer
+        drawnItems.addLayer(marker);
+    });
+    </script>
+</body>
+
+</html>
