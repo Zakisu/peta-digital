@@ -97,7 +97,7 @@
               @endguest
               @auth
                 <h3 class="page-title text-truncate text-dark font-weight-medium mb-1">Halo,
-                  {{-- {{Auth::user()->nama}}! --}}
+                  {{ Auth::user()->email }}!
               </h3>
               @endauth
             </div>

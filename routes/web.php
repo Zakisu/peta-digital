@@ -30,6 +30,16 @@ Route::get('/admin',[AdminController::class, 'index']);
 Route::get('/desa',[DesaController::class, 'index']);
 Route::get('/tentang',[TentangController::class, 'index']);
 
+/*admin */
+Route::post('/create-admin',[AdminController::class, 'store'])->name('admin.store');
+Route::get('/admins',[AdminController::class, 'listAdmin'])->name('admin.list');
+Route::delete('/delete-admin/{id}',[AdminController::class, 'destroy'])->name('admin.destroy');
+Route::put('/update-admin/{id}',[AdminController::class, 'update'])->name('admin.update');
 
+/*about */
+Route::get('/about',[TentangController::class, 'listAbout'])->name('about.list');
+Route::put('/update-about/{id}',[TentangController::class, 'update'])->name('about.update');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', function () {
+  return redirect('/admin');
+});

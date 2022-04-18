@@ -23,7 +23,7 @@
               <tbody>
                 <tr v-for="item, index in mainData" :key="index">
                   <td>@{{ index+1 }}</td>
-                  <td>@{{ item.nama_bentuk == 'null' ? '' : item.nama_bentuk}}</td>
+                  <td>@{{ item.content}}</td>
                   <td>
                     <a href="javascript:void(0);" @click="editModal(item)" class="text-success"
                       data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i
@@ -44,23 +44,21 @@
   <div class="modal-dialog modal-lg" id="modal">
     <div class="modal-content">
       <div class="modal-header ">
-        <h4 class="modal-title" v-show="!editMode" id="myLargeModalLabel">Tambah Admin</h4>
         <h4 class="modal-title" v-show="editMode" id="myLargeModalLabel">Edit</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       </div>
       <form @submit.prevent="editMode ? updateData() : storeData()" @keydown="form.onKeydown($event)" id="form">
           <div class="modal-body mx-4">
             <div class="form-row">
-              <label class="col-lg-2" for="deskripsi"> Deskripsi </label>
+              <label class="col-lg-2" for="content"> Deskripsi </label>
               <div class="form-group col-md-8">
-                <input v-model="form.deskripsi" id="deskripsi" type="text-area" min=0 placeholder="Masukkan deskripsi"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('deskripsi') }">
-                <has-error :form="form" field="deskripsi"></has-error>
+                <input v-model="form.content" id="content" type="text-area" min=0 placeholder="Masukkan deskripsi"
+                    class="form-control" :class="{ 'is-invalid': form.errors.has('content') }">
+                <has-error :form="form" field="content"></has-error>
               </div>
             </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
-            <button v-show="!editMode" type="submit" class="btn btn-primary">Tambah</button>
             <button v-show="editMode" type="submit" class="btn btn-success">Ubah</button>
           </div>
       </form>
@@ -76,15 +74,12 @@
   var app = new Vue({
     el: '#app',
     data: {
-      mainData: [
-        {
-          data : '1',
-        }
-      ],
+      mainData: [],
       form: new Form({
         id: '',
-        deskripsi: '',
+        content: '',
       }),
+      editMode:false,
     },
     mounted() {
       this.refreshData()
@@ -100,10 +95,34 @@
 
       },
       updateData(){
-
+        url = "{{ route('about.update', ':id') }}".replace(':id', this.form.id)
+        this.form.put(url)
+        .then(response => {
+          $('#modal').modal('hide');
+          Swal.fire(
+            'Berhasil',
+            'Data tentang berhasil diubah',
+            'success'
+          )
+          this.refreshData()
+        })
+        .catch(e => {
+            e.response.status != 422 ? console.log(e) : '';
+        })
       },
       refreshData() {
-        console.log('blog',this.mainData)
+        axios.get("{{ route('about.list') }}")
+        .then(response => {
+          console.log('res',response)
+          $('#table').DataTable().destroy()
+          this.mainData = response.data
+          this.$nextTick(function () {
+              $('#table').DataTable();
+          })
+        })
+        .catch(e => {
+          e.response.status != 422 ? console.log(e) : '';
+        })
       }
     },
   })

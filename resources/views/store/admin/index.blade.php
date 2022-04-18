@@ -17,15 +17,15 @@ Admin
             <table id="table" class="table table-striped table-bordered no-wrap">
               <thead>
                   <tr>
-                      <th>No</th>
-                      <th>Email</th>
-                      <th>Aksi</th>
+                    <th>No</th>
+                    <th>Email</th>
+                    <th>Aksi</th>
                   </tr>
               </thead>
               <tbody>
                 <tr v-for="item, index in mainData" :key="index">
                   <td>@{{ index+1 }}</td>
-                  <td>@{{ item.nama_bentuk == 'null' ? '' : item.nama_bentuk}}</td>
+                  <td>@{{ item.email}}</td>
                   <td>
                     <a href="javascript:void(0);" @click="editModal(item)" class="text-success"
                       data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i
@@ -63,10 +63,10 @@ Admin
                 <has-error :form="form" field="email"></has-error>
               </div>
             </div>
-            <div class="form-row">
+            <div class="form-row" v-show="!editMode">
               <label class="col-lg-2" for="password"> Password </label>
               <div class="form-group col-md-8">
-                <input v-model="form.password" id="password" type="text" min=0 placeholder="Masukkan password"
+                <input v-model="form.password" id="password" type="password" min=0 placeholder="Masukkan password"
                     class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
                 <has-error :form="form" field="password"></has-error>
               </div>
@@ -83,72 +83,114 @@ Admin
 @endsection
 
 @push('script')
-  <script>
-    var app = new Vue({
-      el: '#app',
-      data: {
-        mainData: [
-          {
-            data : '1',
-          }
-        ],
-        form: new Form({
-          id: '',
-          email: '',
-          password: '',
-        }),
-        editMode: false,
-      },
-      mounted() {
-        this.refreshData()
-      },
-      methods: {
-        createModal(){
-          this.editMode = false;
-          this.form.reset();
-          this.form.clear();
-          $('#modal').modal('show');
-        },
-        editModal(data){
-
-        },
-        storeData(){
-
-        },
-        updateData(){
-
-        },
-        deleteData(id){
-          Swal.fire({
-            title: 'Apakah anda yakin?',
-            text: "Anda tidak dapat mengembalikan ini",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.value) {
-              // this.form.delete(url)
-              // .then(response => {
-              //   Swal.fire(
-              //     'Terhapus',
-              //     'Sediaan Obat telah dihapus',
-              //     'success'
-              //   )
-              //   this.refreshData()
-              // })
-              // .catch(e => {
-              //     e.response.status != 422 ? console.log(e) : '';
-              // })
-            }
-        })
-        },
-        refreshData() {
-          console.log('blog',this.mainData)
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      mainData: [
+        {
+          data : '1',
         }
+      ],
+      form: new Form({
+        id: '',
+        email: '',
+        password: '',
+      }),
+      editMode: false,
+    },
+    mounted() {
+      this.refreshData()
+    },
+    methods: {
+      createModal(){
+        this.editMode = false;
+        this.form.reset();
+        this.form.clear();
+        $('#modal').modal('show');
       },
-    })
-  </script>
+      editModal(data){
+        this.editMode = true;
+        this.form.fill(data)
+        this.form.clear();
+        $('#modal').modal('show');
+      },
+      storeData(){
+        this.form.post("{{ route('admin.store') }}")
+        .then(response => {
+          console.log('res',response)
+          $('#modal').modal('hide');
+          Swal.fire(
+              'Berhasil',
+              'Data admin berhasil ditambahkan',
+              'success'
+          )
+          this.refreshData()
+        })
+        .catch(e => {
+            e.response.status != 422 ? console.log(e) : '';
+        })
+      },
+      updateData(){
+        url = "{{ route('admin.update', ':id') }}".replace(':id', this.form.id)
+        this.form.put(url)
+        .then(response => {
+          $('#modal').modal('hide');
+          Swal.fire(
+            'Berhasil',
+            'Data admin berhasil diubah',
+            'success'
+          )
+          this.refreshData()
+        })
+        .catch(e => {
+            e.response.status != 422 ? console.log(e) : '';
+        })
+      },
+      deleteData(id){
+        Swal.fire({
+          title: 'Apakah anda yakin?',
+          text: "Anda tidak dapat mengembalikan ini",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Ya, Hapus',
+          cancelButtonText: 'Batal'
+      }).then((result) => {
+          if (result.value) {
+            url = "{{ route('admin.destroy', ':id') }}".replace(':id', id)
+            this.form.delete(url)
+            .then(response => {
+              console.log('res',response)
+              Swal.fire(
+                'Terhapus',
+                'Data admin telah dihapus',
+                'success'
+              )
+              this.refreshData()
+            })
+            .catch(e => {
+                e.response.status != 422 ? console.log(e) : '';
+            })
+          }
+      })
+      },
+      refreshData() {
+        axios.get("{{ route('admin.list') }}")
+        .then(response => {
+          console.log('res',response)
+          $('#table').DataTable().destroy()
+          this.mainData = response.data
+          this.$nextTick(function () {
+              $('#table').DataTable();
+          })
+        })
+        .catch(e => {
+          e.response.status != 422 ? console.log(e) : '';
+        })
+      }
+    },
+  })
+</script>
 @endpush
