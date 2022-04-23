@@ -9,10 +9,9 @@
       <div class="card">
         <div class="card-body">
           <h4 class="card-title">Daftar Desa
-            <button type="button" class="btn btn-primary btn-rounded float-right mb-3" @click="createModal()">
-            <i class="fas fa-plus-circle"></i> Tambah Desa</button>
+            <button type="button" class="btn btn-primary btn-rounded float-right mb-3" >
+            <a href="{{url('/desa/tambah')}}" style="color: white;"> <i class="fas fa-plus-circle"></i> Tambah Desa</a></button>
           </h4>
-          
           <div class="table-responsive">
             <table id="table" class="table table-striped table-bordered no-wrap">
               <thead>
@@ -31,7 +30,7 @@
                   <td></td>
                   <td></td>
                   <td>
-                    <a href="javascript:void(0);" @click="editModal(item)" class="text-success"
+                    <a href="javascript:void(0);" @click="editData(item)" class="text-success"
                       data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i
                       class="far fa-edit"></i></a>
                     <a href="javascript:void(0);" @click="deleteData(item.id)" class="text-danger"
@@ -47,67 +46,6 @@
     </div>
   </div>
 </div>
-
-<!-- MODAL -->
-<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" id="modal">
-    <div class="modal-content">
-      <div class="modal-header ">
-        <h4 class="modal-title" v-show="!editMode" id="myLargeModalLabel">Tambah Desa</h4>
-        <h4 class="modal-title" v-show="editMode" id="myLargeModalLabel">Edit</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      </div>
-      <form @submit.prevent="editMode ? updateData() : storeData()" @keydown="form.onKeydown($event)" id="form">
-          <div class="modal-body mx-4">
-            <div class="form-row">
-              <label class="col-lg-2" for="email"> Email </label>
-              <div class="form-group col-md-8">
-                <input v-model="form.email" id="email" type="text" min=0 placeholder="Masukkan Email"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('email') }">
-                <has-error :form="form" field="email"></has-error>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="col-lg-2" for="password"> Password </label>
-              <div class="form-group col-md-8">
-                <input v-model="form.password" id="password" type="text" min=0 placeholder="Masukkan password"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
-                <has-error :form="form" field="password"></has-error>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="col-lg-2" for="lat"> lat </label>
-              <div class="form-group col-md-8">
-                <input v-model="form.lat" id="lat" type="text" min=0 placeholder="Masukkan lat"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('lat') }">
-                <has-error :form="form" field="lat"></has-error>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="col-lg-2" for="lng"> lng </label>
-              <div class="form-group col-md-8">
-                <input v-model="form.lng" id="lng" type="text" min=0 placeholder="Masukkan lng"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('lng') }">
-                <has-error :form="form" field="lng"></has-error>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="col-lg-2" for="password"> Pilih Lokasi Desa </label>
-              <div class="form-group col-md-8">
-              </div>
-            </div>
-            <div id="here-maps">
-              <label for="">Pin Location</label>
-              <div style="height: 500px" id="mapContainer"></div>
-             </div>
-              
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-          </div>
-      </form>
-    </div>
-  </div>
-</div>
 @endsection
 
 
@@ -116,15 +54,14 @@
   var app = new Vue({
     el: '#app',
     data: {
-      mainData: [
-        {
-          data : '1',
-        }
-      ],
+      mainData: [],
       form: new Form({
         id: '',
-        email: '',
-        password: '',
+        title: '',
+        description: '',
+        lat: '',
+        lng: '',
+        images : [],
       }),
       editMode: false,
     },
@@ -132,19 +69,16 @@
       this.refreshData()
     },
     methods: {
-      createModal(){
-        this.editMode = false;
-        this.form.reset();
-        this.form.clear();
-        $('#modal').modal('show');
+      upload(event) {
+        for (let file of event.target.images) {
+          try {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            this.form.images.push(file);
+          } catch {}
+        }
       },
-      editModal(data){
-
-      },
-      storeData(){
-
-      },
-      updateData(){
+      editData(id){
 
       },
       deleteData(id){
@@ -179,6 +113,5 @@
       }
     },
   })
-  window.action = "submit"
- </script>
+</script>
 @endpush

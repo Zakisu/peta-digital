@@ -23,22 +23,36 @@ class DesaController extends Controller
         return $about;
     }
 
+    public function create(){
+        return view('store.desa.create');
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'coordinate' => 'required',
-            'image' => 'required',
-            'description' => 'required',
-        ]);
 
-        $village = New Village;
-        $village->title = $request->title;
-        $village->coordinate = $request->coordinate; 
+        // dd($request);
+        if($request->hasfile('cek')){
 
-        $village->save();
+            // $file = $request->file('file');
 
-        return $village;
+            // $extension = $file->getClientOriginalExtension();
+            // $extension = $file->getClientOriginalExtension();
+            dd($request->file('cek'));
+        }
+        // $request->validate([
+        //     'title' => 'required',
+        //     'coordinate' => 'required',
+        //     'image' => 'required',
+        //     'description' => 'required',
+        // ]);
+
+        // $village = New Village;
+        // $village->title = $request->title;
+        // $village->coordinate = $request->coordinate; 
+
+        // $village->save();
+
+        return $request;
     }
 
     public function update(Request $request, $id)

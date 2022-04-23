@@ -40,6 +40,11 @@ Route::put('/update-admin/{id}',[AdminController::class, 'update'])->name('admin
 Route::get('/about',[TentangController::class, 'listAbout'])->name('about.list');
 Route::put('/update-about/{id}',[TentangController::class, 'update'])->name('about.update');
 
+
+/*desa */
+Route::get('/desa/tambah',[DesaController::class, 'create'])->name('village.create');
+Route::post('/create-village',[DesaController::class, 'store'])->name('village.store');
+
 Route::get('/home', function () {
   return redirect('/admin');
 });
