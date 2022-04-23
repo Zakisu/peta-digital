@@ -9,55 +9,62 @@
       <div class="card">
         <div class="card-body"> 
           <h4 class="card-title">Tambah Desa</h4>
-          <form class="mt-4" @submit.prevent="editMode ? updateData() : storeData()" @keydown="form.onKeydown($event)" id="form" enctype="multipart/form-data">
+          <form 
+            class="mt-4" 
+            @submit.prevent="editMode ? updateData() : storeData()" 
+            @keydown="form.onKeydown($event)" 
+            id="form" 
+            enctype="multipart/form-data"
+          >
             <div class="form-body">
               <div class="row">
-                <div class="col-md-11">
+                <div class="col-md-12">
                   <label class="col-lg-2" for="title"> Nama Desa </label>
-                  <div class="form-group col-md-8">
+                  <div class="form-group col-md-12">
                     <input v-model="form.title" id="title" type="text" min=0 placeholder="Nama Desa"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('title') }">
                     <has-error :form="form" field="title"></has-error>
                   </div>
                 </div>
-                <div class="col-md-11">
+                <div class="col-md-12">
                   <label class="col-lg-2" for="description"> Deskripsi </label>
-                  <div class="form-group col-md-8">
+                  <div class="form-group col-md-12">
                     <textarea v-model="form.description" id="description" type="text" min=0 placeholder="Masukkan deskripsi"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('description') }"></textarea>
                     <has-error :form="form" field="description"></has-error>
                   </div>
                 </div>
-                <div class="col-md-11" v-show="false">
+                <div class="col-md-12" v-show="false">
                   <label class="col-lg-2" for="latitude"> latitude </label>
-                  <div class="form-group col-md-8">
+                  <div class="form-group col-md-12">
                     <input id="latitude" type="text" min=0 placeholder="Masukkan latitude"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('latitude') }">
                     <has-error :form="form" field="latitude"></has-error>
                   </div>
                 </div>
-                <div class="col-md-11" v-show="false">
+                <div class="col-md-12" v-show="false">
                   <label class="col-lg-2" for="longitude"> longitude </label>
-                  <div class="form-group col-md-8">
+                  <div class="form-group col-md-12">
                     <input id="longitude" type="text" min=0 placeholder="Masukkan longitude"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('longitude') }">
                     <has-error :form="form" field="longitude"></has-error>
                   </div>
                 </div>
-                <div class="col-md-11" >
+                <div class="col-md-12" >
                   <input type="file" @change="upload($event)" class="form-control" multiple>
                 </div>
-                <div class="col-md-11">
-                  <label class="col-lg-2" for="password"> Pilih Lokasi Desa </label>
-                  <div class="form-group col-md-8">
+                <div class="col-md-12 mt-4 mb-4" style="z-index: 1000" >
+                  <label class="col-lg-2" for="description"> Pilih Lokasi Desa </label>
+                  <div class="form-group col-md-12">
+                  <div id="map" style="width:100%;height: 40vh"></div>
                   </div>
                 </div>
-                <div class="col-md-11" >
-                  <div id="map" style="width:100%;height: 60vh"></div>
-                </div>
-                <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Tambah</button>
-                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <div class="text-left">
+                  <button type="submit" class="btn btn-info">Submit</button>
+                  <button type="reset" class="btn btn-dark">Reset</button>
               </div>
             </div>
           </form>
