@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Village;
+use File;
 
 
 class DesaController extends Controller
@@ -19,8 +20,8 @@ class DesaController extends Controller
     }
 
     public function listVillages(){
-        $about = Village::all();
-        return $about;
+        $villages = Village::all();
+        return $villages;
     }
 
     public function create(){
@@ -30,29 +31,40 @@ class DesaController extends Controller
     public function store(Request $request)
     {
 
-        // dd($request);
-        if($request->hasfile('cek')){
-
-            // $file = $request->file('file');
-
-            // $extension = $file->getClientOriginalExtension();
-            // $extension = $file->getClientOriginalExtension();
-            dd($request->file('cek'));
+        $request->validate([
+            'title' => 'required',
+            'coordinate' => 'required',
+            'images' => 'required',
+            'description' => 'required',
+        ]);
+        $files = [];
+        if($request->hasfile('images')){
+            foreach ($request->file('images') as $imagefile) {
+                $extension = $imagefile->getClientOriginalExtension();
+                $filename = time().rand(1,100) . '.' . $extension;
+                $imagefile->move('uploads/villages/', $filename);
+                $files[] = $filename;
+                // $files[] = asset('uploads/villages/'.$filename);
+            }
         }
-        // $request->validate([
-        //     'title' => 'required',
-        //     'coordinate' => 'required',
-        //     'image' => 'required',
-        //     'description' => 'required',
-        // ]);
 
-        // $village = New Village;
-        // $village->title = $request->title;
-        // $village->coordinate = $request->coordinate; 
+        $village = New Village;
+        $village->title = $request->title; 
+        $village->coordinate = $request->coordinate; 
+        $village->description = $request->description; 
+        $village->image = json_encode($files); 
+        $village->save();
 
-        // $village->save();
+        return $village;
+    }
 
-        return $request;
+    public function edit(){
+        return view('store.desa.edit');
+    }
+
+    public function detail($id){
+        $village = Village::find($id);
+        return $village;
     }
 
     public function update(Request $request, $id)
@@ -60,17 +72,44 @@ class DesaController extends Controller
         $request->validate([
             'title' => 'required',
             'coordinate' => 'required',
+            'images' => 'required',
             'description' => 'required',
         ]);
 
-        return Village::find($id)->update($request->all());
+        $village = Village::find($id);
+
+        $items = array();
+        if($request->hasfile('images')){
+            foreach ($images as $imagefile) {
+                $image = public_path('uploads/villages/'.$imagefile);
+                $items[] = $image;
+            }
+            File::delete($items);
+
+            foreach ($request->file('images') as $imagefile) {
+                $extension = $imagefile->getClientOriginalExtension();
+                $filename = time().rand(1,100) . '.' . $extension;
+                $imagefile->move('uploads/villages/', $filename);
+                $files[] = $filename;
+            }
+            $village->save();
+        }
+
+        $village->update($request->all());
+        return $village;
     }
 
     public function destroy($id)
     {
-       return Village::find($id)->delete();
+        $village = Village::find($id);
+        $images = json_decode($village->image);
 
+        $items = array();
+        foreach ($images as $imagefile) {
+            $image = public_path('uploads/villages/'.$imagefile);
+            $items[] = $image;
+        }
+        File::delete($items);
+        return $village->delete();
     }
-
-
 }

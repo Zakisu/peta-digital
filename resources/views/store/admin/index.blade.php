@@ -130,6 +130,7 @@ Admin
         .catch(e => {
             e.response.status != 422 ? console.log(e) : '';
         })
+        console.log('form',this.form)
       },
       updateData(){
         url = "{{ route('admin.update', ':id') }}".replace(':id', this.form.id)
@@ -179,7 +180,6 @@ Admin
       refreshData() {
         axios.get("{{ route('admin.list') }}")
         .then(response => {
-          console.log('res',response)
           $('#table').DataTable().destroy()
           this.mainData = response.data
           this.$nextTick(function () {

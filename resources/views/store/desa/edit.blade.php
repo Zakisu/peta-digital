@@ -1,6 +1,6 @@
 @extends('layout.master')
 @section('title')
-  Tambah Desa
+  Edit Desa
 @endsection
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body"> 
-          <h4 class="card-title">Tambah Desa</h4>
+          <h4 class="card-title">Edit Desa</h4>
           <form 
             class="mt-4" 
             @submit.prevent="storeData()" 
@@ -112,6 +112,7 @@
       }
     },
     mounted() {
+      this.refreshData();
       ClassicEditor
       .create( document.querySelector( '#description' ) )
       .then( editor => {
@@ -152,15 +153,15 @@
           for(let i=0; i < this.form.images.length; i++){
             params.append("images[]", this.form.images[i])
           }
-          axios.post("{{ route('village.store') }}",params)
+          url = "{{ route('village.update', ':id') }}".replace(':id', 23)
+          axios.post(url,params)
           .then(response => {
             Swal.fire(
                 'Berhasil',
                 'Data desa berhasil ditambahkan',
                 'success'
             )
-            url = "{{ route('village.view') }}"
-            window.location = url
+            window.location.href('/desa');
           }).catch(e => {
               e.response.status != 422 ? console.log(e) : '';
           })
@@ -171,6 +172,22 @@
         this.form.title = ""
         this.form.images = []
         this.editorData.setData("",function() { this.updateElement(); })
+      },
+      refreshData() {
+        console.log('tes')
+        url = "{{ route('village.detail', ':id') }}".replace(':id', 23)
+        axios.get(url)
+        .then(response => {
+          this.form.title = response.data.title
+          this.editorData.setData(response.data.description) 
+          let splitCoordinate = response.data.coordinate.split("|")
+          $('#latitude').val(splitCoordinate[0]);
+          $('#longitude').val(splitCoordinate[1]);
+          console.log('res',response)
+        })
+        .catch(e => {
+          e.response.status != 422 ? console.log(e) : '';
+        })
       }
     },
   })
@@ -182,11 +199,11 @@
   }, 100);
   
   var mapCenter = [{{ request('latitude', config('leaflet.map_center_latitude')) }}, {{ request('longitude', config('leaflet.map_center_longitude')) }}];
-    var map = L.map('map').setView(mapCenter, {{ config('leaflet.zoom_level') }});
+  var map = L.map('map').setView(mapCenter, {{ config('leaflet.zoom_level') }});
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
   var marker = L.marker(mapCenter).addTo(map);
   function updateMarker(lat, lng) {

@@ -27,7 +27,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/admin',[AdminController::class, 'index']);
-Route::get('/desa',[DesaController::class, 'index']);
+Route::get('/desa',[DesaController::class, 'index'])->name('village.view');
 Route::get('/tentang',[TentangController::class, 'index']);
 
 /*admin */
@@ -42,8 +42,13 @@ Route::put('/update-about/{id}',[TentangController::class, 'update'])->name('abo
 
 
 /*desa */
+Route::get('/villages',[DesaController::class, 'listVillages'])->name('village.list');
 Route::get('/desa/tambah',[DesaController::class, 'create'])->name('village.create');
+Route::get('/desa/edit',[DesaController::class, 'edit'])->name('village.edit');
+Route::delete('/delete-village/{id}',[DesaController::class, 'destroy'])->name('village.destroy');
 Route::post('/create-village',[DesaController::class, 'store'])->name('village.store');
+Route::get('/detail-village/{id}',[DesaController::class, 'detail'])->name('village.detail');
+Route::post('/update-village/{id}',[DesaController::class, 'update'])->name('village.update');
 
 Route::get('/home', function () {
   return redirect('/admin');
