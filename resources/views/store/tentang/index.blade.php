@@ -23,7 +23,7 @@
               <tbody>
                 <tr v-for="item, index in mainData" :key="index">
                   <td>@{{ index+1 }}</td>
-                  <td>@{{ item.content}}</td>
+                  <td v-html="item.content"></td>
                   <td>
                     <a href="javascript:void(0);" @click="editModal(item)" class="text-success"
                       data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i
@@ -52,9 +52,10 @@
             <div class="form-row">
               <label class="col-lg-2" for="content"> Deskripsi </label>
               <div class="form-group col-md-8">
-                <input v-model="form.content" id="content" type="text-area" min=0 placeholder="Masukkan deskripsi"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('content') }">
-                <has-error :form="form" field="content"></has-error>
+                <textarea v-model="form.content" id="content" type="text" min=0 placeholder="Masukkan deskripsi"
+                class="form-control" :class="{ 'is-invalid': this.error.content  }" rows="5"></textarea>
+                <has-error :form="form" field="content"></has-error> 
+               
               </div>
             </div>
           <div class="modal-footer">
@@ -79,9 +80,21 @@
         id: '',
         content: '',
       }),
+      editorData: null,
       editMode:false,
+      error : {
+        content : false,
+      }
     },
     mounted() {
+      ClassicEditor
+      .create( document.querySelector( '#content' ) )
+      .then( editor => {
+        this.editorData = editor;
+      } )
+      .catch( error => {
+        console.error( error );
+      });
       this.refreshData()
     },
     methods: {
@@ -95,6 +108,7 @@
 
       },
       updateData(){
+        this.form.content = this.editorData.getData()
         url = "{{ route('about.update', ':id') }}".replace(':id', this.form.id)
         this.form.put(url)
         .then(response => {
@@ -114,6 +128,7 @@
         axios.get("{{ route('about.list') }}")
         .then(response => {
           console.log('res',response)
+          this.editorData.setData(response.data[0].content) 
           $('#table').DataTable().destroy()
           this.mainData = response.data
           this.$nextTick(function () {

@@ -30,4 +30,18 @@ class Village extends Model
 		'image',
 		'description'
 	];
+
+	protected $appends = ['image_URL'];
+  public function getImageURLAttribute()
+  {
+      if ($this->image == null) {
+          abort(404);
+      }
+			$images = json_decode($this->image) ;
+
+			foreach ($images as $image){
+				$imageArray[] = asset('uploads/villages/' . $image);
+			}
+			return $imageArray;
+  }
 }

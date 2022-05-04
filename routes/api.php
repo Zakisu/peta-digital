@@ -3,9 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\API\BlogController as BlogApiController;
-use App\Http\Controllers\API\BuyerController as BuyerApiController;
-use App\Http\Controllers\API\ProductController as ProductApiController;
+use App\Http\Controllers\APIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resources(['blogs' => BlogApiController::class]);
-Route::resources(['buyers' => BuyerApiController::class]);
-Route::resources(['products' => ProductApiController::class]);
+Route::get('/about',[APIController::class, 'getAbout']);
+Route::get('/villages',[APIController::class, 'getVillages']);
+Route::get('/village/{id}',[APIController::class, 'getDetailVillage']);
