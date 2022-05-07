@@ -33,4 +33,13 @@ class APIController extends Controller
             'data' => $village,
         ]);
     }
+
+    public function getAllLocation(){
+        $villages = Village::all();
+        return response()->json([
+            'status' => 'Success',
+            'size' => sizeof($villages),
+            'data' => $villages,
+        ]); 
+    }
 }

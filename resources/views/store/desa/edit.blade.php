@@ -57,10 +57,7 @@
                 <div class="col-md-12" >
                   <label class="col-lg-2" for="image"> Upload Gambar </label>
                   <div class="form-group col-md-12">
-                    <input id="images" class="form-control" style="height: 45px !important;" type="file" @change="upload($event)" multiple :class="{ 'is-invalid': this.error.images }">
-                    <div class="invalid-feedback">
-                      Images is required
-                    </div>
+                    <input id="images" class="form-control" style="height: 45px !important;" type="file" @change="upload($event)" multiple>
                   </div>
                 </div>
                 <div class="col-md-12 mt-4 mb-4" style="z-index: 1000" >
@@ -77,7 +74,7 @@
             </div>
             <div class="form-actions">
               <div class="text-left">
-                  <button type="submit" class="btn btn-info">Tambah</button>
+                  <button type="submit" class="btn btn-info">Ubah</button>
                   <button type="reset" id="reset" class="btn btn-dark" @click="resetData()">Reset</button>
               </div>
             </div>
@@ -133,6 +130,8 @@
         }
       },
       storeData(){
+        let id = window.location.pathname.split("/").pop()
+
         let latitude = $('#latitude').val()
         let longitude = $('#longitude').val()
         this.form.coordinate = latitude.concat("|", longitude)
@@ -141,8 +140,6 @@
           this.error.title = true
         }else if(this.editorData.getData() === ""){
           this.error.description = true
-        }else if(this.form.images.length === 0){
-          this.error.images = true
         }else if (latitude === "" || longitude === ""){
           this.error.coordinate = true
         }else{
@@ -153,15 +150,16 @@
           for(let i=0; i < this.form.images.length; i++){
             params.append("images[]", this.form.images[i])
           }
-          url = "{{ route('village.update', ':id') }}".replace(':id', 23)
+          url = "{{ route('village.update', ':id') }}".replace(':id', id)
           axios.post(url,params)
           .then(response => {
             Swal.fire(
                 'Berhasil',
                 'Data desa berhasil ditambahkan',
                 'success'
-            )
-            window.location.href('/desa');
+            ).then((value) => {
+                window.location = "{{route('village.view')}}"
+            })
           }).catch(e => {
               e.response.status != 422 ? console.log(e) : '';
           })
@@ -174,8 +172,8 @@
         this.editorData.setData("",function() { this.updateElement(); })
       },
       refreshData() {
-        console.log('tes')
-        url = "{{ route('village.detail', ':id') }}".replace(':id', 23)
+        let id = window.location.pathname.split("/").pop()
+        url = "{{ route('village.detail', ':id') }}".replace(':id', id)
         axios.get(url)
         .then(response => {
           this.form.title = response.data.title

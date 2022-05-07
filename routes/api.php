@@ -23,3 +23,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/about',[APIController::class, 'getAbout']);
 Route::get('/villages',[APIController::class, 'getVillages']);
 Route::get('/village/{id}',[APIController::class, 'getDetailVillage']);
+Route::get('/locations',[APIController::class, 'getAllLocation']);

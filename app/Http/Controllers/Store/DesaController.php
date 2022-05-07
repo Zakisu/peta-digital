@@ -44,7 +44,6 @@ class DesaController extends Controller
                 $filename = time().rand(1,100) . '.' . $extension;
                 $imagefile->move('uploads/villages/', $filename);
                 $files[] = $filename;
-                // $files[] = asset('uploads/villages/'.$filename);
             }
         }
 
@@ -72,13 +71,13 @@ class DesaController extends Controller
         $request->validate([
             'title' => 'required',
             'coordinate' => 'required',
-            'images' => 'required',
             'description' => 'required',
         ]);
 
         $village = Village::find($id);
 
         $items = array();
+        $images = json_decode($village->image);
         if($request->hasfile('images')){
             foreach ($images as $imagefile) {
                 $image = public_path('uploads/villages/'.$imagefile);
